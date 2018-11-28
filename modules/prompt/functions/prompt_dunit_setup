@@ -1,0 +1,78 @@
+#
+# dunit's theme based on dunit
+#
+#
+# Authors:
+#   Dave Thompson <dave.thompson@limscoder.com>
+#
+
+# Load dependencies.
+pmodload 'helper'
+
+function prompt_dunit_build_prompt {
+  print -n "[%F{magenta}$_prompt_dunit_pwd%f]"
+
+  if [[ -n "$git_info" ]]; then
+    print -n " (%F{cyan}${(e)git_info[ref]}%f)"
+  fi
+}
+
+function prompt_dunit_precmd {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+
+  # Format PWD.
+  _prompt_dunit_pwd=$(prompt-pwd)
+
+  # Get Git repository information.
+  if (( $+functions[git-info] )); then
+    git-info
+  fi
+}
+
+function prompt_dunit_setup {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  prompt_opts=(cr percent sp subst)
+
+  # Load required functions.
+  autoload -Uz add-zsh-hook
+
+  # Add hook for calling git-info before each command.
+  add-zsh-hook precmd prompt_dunit_precmd
+
+  # Format pwd
+  zstyle ':prezto:module:prompt' pwd-length 'short'
+
+  # Set editor-info parameters.
+  zstyle ':prezto:module:editor:info:completing' format '%B%F{red}...%f%b'
+  zstyle ':prezto:module:editor:info:keymap:primary' format '%B%F{blue}❯%f%b'
+  zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format '%F{red}♺%f'
+  zstyle ':prezto:module:editor:info:keymap:alternate' format '%B%F{red}❮%f%b'
+
+  # Set git-info parameters.
+  zstyle ':prezto:module:git:info' verbose 'yes'
+  zstyle ':prezto:module:git:info:action' format ' ⁝ %s'
+  zstyle ':prezto:module:git:info:added' format ' ✚'
+  zstyle ':prezto:module:git:info:ahead' format ' ⬆'
+  zstyle ':prezto:module:git:info:behind' format ' ⬇'
+  zstyle ':prezto:module:git:info:branch' format '%b'
+  zstyle ':prezto:module:git:info:commit' format '%.5c'
+  zstyle ':prezto:module:git:info:deleted' format ' ✖'
+  zstyle ':prezto:module:git:info:dirty' format ' ⁝'
+  zstyle ':prezto:module:git:info:modified' format ' ✱'
+  zstyle ':prezto:module:git:info:position' format '%p'
+  zstyle ':prezto:module:git:info:renamed' format ' ➙'
+  zstyle ':prezto:module:git:info:stashed' format ' S'
+  zstyle ':prezto:module:git:info:unmerged' format ' ═'
+  zstyle ':prezto:module:git:info:untracked' format ' ?'
+  zstyle ':prezto:module:git:info:keys' format \
+    'ref' '$(coalesce "%b" "%p" "%c")' \
+    'status' '%s%D%A%B%S%a%d%m%r%U%u'
+
+  # Define prompts.
+  PROMPT='${(e)$(prompt_dunit_build_prompt)} ${editor_info[keymap]}${editor_info[keymap]} '
+  SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? '
+}
+
+prompt_dunit_setup "$@"
