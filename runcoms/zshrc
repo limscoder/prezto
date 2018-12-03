@@ -18,14 +18,8 @@ HISTSIZE=5000
 SAVEHIST=5000
 
 # Editor
-EDITOR=$(which vim)
-GIT_EDITOR=$(which vim)
-bindkey -v
-
-# Completion
-zstyle :compinstall filename '/Users/dave.thompson/.zshrc'
-autoload -Uz compinit
-compinit
+EDITOR=/usr/bin/vim
+GIT_EDITOR=/usr/bin/vim
 
 # Aliases
 alias gs="git status"

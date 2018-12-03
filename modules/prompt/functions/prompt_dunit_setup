@@ -1,6 +1,5 @@
 #
-# dunit's theme based on dunit
-#
+# dunit's theme
 #
 # Authors:
 #   Dave Thompson <dave.thompson@limscoder.com>
@@ -10,11 +9,22 @@
 pmodload 'helper'
 
 function prompt_dunit_build_prompt {
+  #prompt_dunit_start_segment white black
+  print -n "%B%(?.%F{white}==%f.%F{red}==:$?%f) "
   print -n "[%F{magenta}$_prompt_dunit_pwd%f]"
 
   if [[ -n "$git_info" ]]; then
     print -n " (%F{cyan}${(e)git_info[ref]}%f)"
   fi
+
+  if [[ -n "$python_info" ]]; then
+    print -n " {%F{green}${(e)python_info[virtualenv]}%f}"
+  fi
+
+  now=$(date +"%T")
+  print -n " $now"
+  print -n " %(?.%F{white}==%f.%F{red}==%f)%b"
+  #prompt_dunit_end_segment
 }
 
 function prompt_dunit_precmd {
@@ -27,6 +37,11 @@ function prompt_dunit_precmd {
   # Get Git repository information.
   if (( $+functions[git-info] )); then
     git-info
+  fi
+
+  # Get Python environment information.
+  if (( $+functions[python-info] )); then
+    python-info
   fi
 }
 
@@ -46,9 +61,9 @@ function prompt_dunit_setup {
 
   # Set editor-info parameters.
   zstyle ':prezto:module:editor:info:completing' format '%B%F{red}...%f%b'
-  zstyle ':prezto:module:editor:info:keymap:primary' format '%B%F{blue}❯%f%b'
+  zstyle ':prezto:module:editor:info:keymap:primary' format '%B❯❯%b'
   zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format '%F{red}♺%f'
-  zstyle ':prezto:module:editor:info:keymap:alternate' format '%B%F{red}❮%f%b'
+  zstyle ':prezto:module:editor:info:keymap:alternate' format '%B%F{red}❮❮%f%b'
 
   # Set git-info parameters.
   zstyle ':prezto:module:git:info' verbose 'yes'
@@ -71,8 +86,9 @@ function prompt_dunit_setup {
     'status' '%s%D%A%B%S%a%d%m%r%U%u'
 
   # Define prompts.
-  PROMPT='${(e)$(prompt_dunit_build_prompt)} ${editor_info[keymap]}${editor_info[keymap]} '
-  SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? '
+  NEWLINE=$'\n'
+  PROMPT='${(e)$(prompt_dunit_build_prompt)}${NEWLINE}%B%F{blue}${editor_info[keymap]}%f%b '
+  SPROMPT='zsh: correct %B%F{red}%R%f%b to %B%F{green}%r%f%b [nyae]? '
 }
 
 prompt_dunit_setup "$@"
