@@ -12,14 +12,28 @@ fi
 
 # Customize to your needs...
 
-# History
+# ssh-agent
+if [[ -z "${SSH_AUTH_SOCK}" ]]; then
+  ssh-agent
+fi
+
+# Shell vars
 HISTFILE=~/.histfile
 HISTSIZE=5000
 SAVEHIST=5000
-
-# Editor
 EDITOR=/usr/bin/vim
-GIT_EDITOR=/usr/bin/vim
+
+# Exported vars
+export GIT_EDITOR=/usr/bin/vim
 
 # Aliases
 alias gs="git status"
+alias tl="tmux_local"
+alias killalldocker='docker kill $(docker ps -q) &&  docker rm $(docker ps -a -q)'
+alias wsh='ssh -F ~/code/workstation/ssh-config/config'
+alias ap='/Users/dave.thompson/code/workstation/docker-ansible/bin/docker-ansible-playbook -u dave.thompson' 
+
+# PT dev aliases (https://ghe.megaleo.com/cban/web-resources/blob/master/docs/aliases.md)
+alias startws='cd ~/code/web-resources && git checkout master && git pull && ./start.sh'
+
+for f in /Users/dave.thompson/code/workstation/support/*.zsh; do source $f; done
