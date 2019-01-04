@@ -21,6 +21,10 @@ function prompt_dunit_build_prompt {
     print -n " {%F{green}${(e)python_info[virtualenv]}%f}"
   fi
 
+  if [[ -n "$kube_ctx" ]]; then
+    print -n " <%F{yellow}${kube_ctx}%f>"
+  fi
+
   now=$(date +"%T")
   print -n " $now"
   print -n " %(?.%F{white}==%f.%F{red}==%f)%b"
@@ -42,6 +46,15 @@ function prompt_dunit_precmd {
   # Get Python environment information.
   if (( $+functions[python-info] )); then
     python-info
+  fi
+
+  # Get kubernetes environment information.
+  which kubectl &> /dev/null
+  if [ $? -eq 0 ]; then
+    kube_ctx=$(kubectl config current-context 2> /dev/null)
+#    if [ $? -eq 0 ]; then
+#      kube_info[ctx]="$kube_ctx"
+#    fi
   fi
 }
 

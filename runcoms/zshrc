@@ -25,15 +25,27 @@ EDITOR=/usr/bin/vim
 
 # Exported vars
 export GIT_EDITOR=/usr/bin/vim
+export GOPATH=/Users/dave.thompson/code/golang
+export PYCURL_SSL_LIBRARY=openssl
 
 # Aliases
 alias gs="git status"
-alias tl="tmux_local"
-alias killalldocker='docker kill $(docker ps -q) &&  docker rm $(docker ps -a -q)'
-alias wsh='ssh -F ~/code/workstation/ssh-config/config'
-alias ap='/Users/dave.thompson/code/workstation/docker-ansible/bin/docker-ansible-playbook -u dave.thompson' 
+alias kc="kubectl"
+alias docker-killall='docker kill $(docker ps -q) &&  docker rm $(docker ps -a -q)'
 
-# PT dev aliases (https://ghe.megaleo.com/cban/web-resources/blob/master/docs/aliases.md)
-alias startws='cd ~/code/web-resources && git checkout master && git pull && ./start.sh'
+# Functions
+kconfig () {
+  if [ -f $1 ]; then
+    export KUBECONFIG="$1"
+    echo "Switched to config \"$1\""
+  else
+    echo "config file not found"
+    return 1
+  fi  
+}
+kcontext () { kubectl config use-context "$1"; }
 
-for f in /Users/dave.thompson/code/workstation/support/*.zsh; do source $f; done
+# PT
+if [ -f ~/code/zsh-pt/.zshrc ]; then
+  source ~/code/zsh-pt/.zshrc
+fi
