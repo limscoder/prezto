@@ -97,7 +97,7 @@ function prompt_dunit_setup {
 
   # Define prompts.
   NEWLINE=$'\n'
-  PROMPT='${(e)$(prompt_dunit_build_prompt)}${NEWLINE}%B%F{blue}${editor_info[keymap]}%f%b '
+  PROMPT='${(e)$(prompt_dunit_build_prompt)}${NEWLINE}%B%F{blue}>>%f%b '
   SPROMPT='zsh: correct %B%F{red}%R%f%b to %B%F{green}%r%f%b [nyae]? '
 }
 
