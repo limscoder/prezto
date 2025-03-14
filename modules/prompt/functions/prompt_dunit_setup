@@ -1,0 +1,108 @@
+#
+# dunit's theme
+#
+# Authors:
+#   Dave Thompson <dave.thompson@limscoder.com>
+#
+
+# Load dependencies.
+pmodload 'helper'
+
+function prompt_dunit_build_prompt {
+  #prompt_dunit_start_segment white black
+  print -n "%(?.%F{white}==%f.%F{red}==:$?%f) "
+  print -n "[%F{cyan}$_prompt_dunit_pwd%f]"
+
+  if [[ -n "$git_info" ]]; then
+    print -n " (%F{yellow}${(e)git_info[ref]}%f)"
+  fi
+
+  if [[ -n "$python_info" ]]; then
+    print -n " {%F{blue}${(e)python_info[virtualenv]}%f}"
+  fi
+
+  if [[ -n "$kube_ctx" ]]; then
+    print -n " <%F{magenta}${kube_ctx}%f>"
+  fi
+
+  now=$(date +"%T")
+  print -n " $now"
+  print -n " %(?.%F{white}==%f.%F{red}==%f)"
+  #prompt_dunit_end_segment
+}
+
+function prompt_dunit_precmd {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+
+  # Format PWD.
+  _prompt_dunit_pwd=$(prompt-pwd)
+
+  # Get Git repository information.
+  if (( $+functions[git-info] )); then
+    git-info
+  fi
+
+  # Get Python environment information.
+  if (( $+functions[python-info] )); then
+    python-info
+  fi
+
+  # Get kubernetes environment information.
+  which kubectl &> /dev/null
+  if [ $? -eq 0 ]; then
+    kube_ctx=$(kubectl config current-context 2> /dev/null)
+  fi
+}
+
+function prompt_dunit_setup {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  prompt_opts=(cr percent sp subst)
+
+  # Load required functions.
+  autoload -Uz add-zsh-hook
+
+  # Add hook for calling git-info before each command.
+  add-zsh-hook precmd prompt_dunit_precmd
+
+  # Format pwd
+  zstyle ':prezto:module:prompt' pwd-length 'short'
+
+  # Set editor-info parameters.
+  zstyle ':prezto:module:editor:info:completing' format '%B%F{red}...%f%b'
+  zstyle ':prezto:module:editor:info:keymap:primary' format '%B❯❯%b'
+  zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format '%F{red}♺%f'
+  zstyle ':prezto:module:editor:info:keymap:alternate' format '%B%F{red}❮❮%f%b'
+
+  # Set git-info parameters.
+  zstyle ':prezto:module:git:info' verbose 'yes'
+  zstyle ':prezto:module:git:info:action' format ' ⁝ %s'
+  zstyle ':prezto:module:git:info:added' format ' ✚'
+  zstyle ':prezto:module:git:info:ahead' format ' ⬆'
+  zstyle ':prezto:module:git:info:behind' format ' ⬇'
+  zstyle ':prezto:module:git:info:branch' format '%b'
+  zstyle ':prezto:module:git:info:commit' format '%.5c'
+  zstyle ':prezto:module:git:info:deleted' format ' ✖'
+  zstyle ':prezto:module:git:info:dirty' format ' ⁝'
+  zstyle ':prezto:module:git:info:modified' format ' ✱'
+  zstyle ':prezto:module:git:info:position' format '%p'
+  zstyle ':prezto:module:git:info:renamed' format ' ➙'
+  zstyle ':prezto:module:git:info:stashed' format ' S'
+  zstyle ':prezto:module:git:info:unmerged' format ' ═'
+  zstyle ':prezto:module:git:info:untracked' format ' ?'
+  zstyle ':prezto:module:git:info:keys' format \
+    'ref' '$(coalesce "%b" "%p" "%c")' \
+    'status' '%s%D%A%B%S%a%d%m%r%U%u'
+
+  # Define prompts.
+  NEWLINE=$'\n'
+  PROMPT='${(e)$(prompt_dunit_build_prompt)}${NEWLINE}%B%F{blue}>>%f%b '
+  SPROMPT='zsh: correct %B%F{red}%R%f%b to %B%F{green}%r%f%b [nyae]? '
+}
+
+export LSCOLORS='gxfxbxdxcxGxDxabagacad'
+export LS_COLORS='di=36:ln=35:so=31:pi=33:ex=32:bd=1;36:cd=1;33:su=30;41:sg=30;46:tw=30;42:ow=30;43'
+zstyle ':completion:*:default' list-colors ${LS_COLORS}
+zstyle ':completion:*:default' list-colors 'di=36:ln=35:so=31:pi=33:ex=32:bd=1;36:cd=1;33:su=30;41:sg=30;46:tw=30;42:ow=30;43'
+prompt_dunit_setup "$@"
