@@ -53,6 +53,8 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
 [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
 
+export PATH="$PATH:$(npm config get prefix)/bin"
+
 # RVM config
 if [ -d "${HOME}/.rvm/bin" ]; then
  export PATH="$PATH:$HOME/.rvm/bin"
